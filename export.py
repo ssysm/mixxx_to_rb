@@ -3,16 +3,29 @@ from rekorxbox_gen import generate
 from typing import List
 from CuePoint import CuePoint, CuePointCollection
 import sqlite3
-from simple_term_menu import TerminalMenu
 from tqdm import tqdm
 import rekorxbox_gen
+import platform
 
-mixxx_db = "/Users/apple/Library/Containers/org.mixxx.mixxx/Data/Library/Application Support/Mixxx/mixxxdb.sqlite"
+mixxx_db = r"C:\Users\admin\AppData\Local\Mixxx\mixxxdb.sqlite"
 
 qpoint_collections: List[CuePointCollection] = []
 
 def mixxx_cuepos_to_ms(cuepos,samplerate,channels):
     return int(float(cuepos) / (int(samplerate) * int(channels)) * 1000)
+
+def get_user_options(playlist):
+    if platform.system() == 'Windows':
+        for i in range(len(playlist)):
+            print('{}, {}'.format(i,playlist[i]))
+        val = input("Enter Playlist Number: ")
+        return int(val)
+    else:
+        from simple_term_menu import TerminalMenu
+        terminal_menu = TerminalMenu(playlist,
+        show_search_hint=True)
+        choosed_playlist = terminal_menu.show()
+        return choosed_playlist
 
 def main():
     con = sqlite3.connect(mixxx_db)
@@ -26,9 +39,7 @@ def main():
         playlist_options.append("{}".format(playlist[1]))
         playlist_ids.append(playlist[0])
 
-    terminal_menu = TerminalMenu(playlist_options,
-        show_search_hint=True)
-    choosed_playlist = terminal_menu.show()
+    choosed_playlist = get_user_options(playlist_options)
     choosed_playlist_id = playlist_ids[choosed_playlist]
 
     tracks_ctx = cur.execute("SELECT position, track_id FROM PlaylistTracks WHERE playlist_id = :id ORDER BY position",{'id':choosed_playlist_id})

@@ -23,7 +23,7 @@ class CuePoint(dict):
 
 class CuePointCollection(dict):
     def __init__(self, track_filename: str, initial_cue_points: List[CuePoint] = None,
-                 id: str=generate_random_number(8), length: int = 0):
+                 id: str=generate_random_number(8), length: int = 999):
         if initial_cue_points is None:
             initial_cue_points: List[CuePoint] = list()
         self.cue_points: List[CuePoint] = initial_cue_points
